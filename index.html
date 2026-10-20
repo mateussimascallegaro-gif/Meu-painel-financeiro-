@@ -1,1 +1,229 @@
 
+
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#070b14">
+<title>Meu Capital</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#070b14;color:#f5f7ff;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
+header{padding:28px 22px 12px;display:flex;justify-content:space-between;align-items:center}
+.brand{font-size:19px;font-weight:800;letter-spacing:.4px}
+.brand span{color:#287bff}
+main{padding:12px 18px 100px;max-width:600px;margin:auto}
+.muted{color:#8c98ac;font-size:13px}
+.card{background:linear-gradient(140deg,#111b30,#0b1020);border:1px solid #1d2b45;border-radius:22px;padding:23px;margin:12px 0}
+.eyebrow{color:#9aa8c0;font-size:13px}
+.balance{font-size:34px;font-weight:750;letter-spacing:-1px;margin:12px 0}
+.blue{color:#3985ff}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:#101725;border:1px solid #1c273a;border-radius:17px;padding:16px 13px}
+.stat strong{display:block;font-size:19px;margin-top:9px;overflow-wrap:anywhere}
+button{border:0;border-radius:13px;padding:14px 16px;font-size:14px;font-weight:700;cursor:pointer}
+.primary{background:#1765f5;color:white;width:100%}
+.secondary{background:#17233a;color:#dce8ff}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:17px 0}
+h2{font-size:17px;margin:25px 0 12px}
+input,select{width:100%;padding:14px;border-radius:12px;border:1px solid #28364d;background:#0a1120;color:white;font-size:16px;margin:7px 0 14px}
+label{font-size:13px;color:#aebbd0}
+.entry{padding:15px 0;border-bottom:1px solid #202a3b;display:flex;justify-content:space-between;gap:12px}
+.entry strong{font-size:14px}
+.entry small{display:block;color:#8997ac;margin-top:5px}
+nav{position:fixed;bottom:0;left:0;right:0;background:#0b101c;border-top:1px solid #1d2738;display:flex;justify-content:space-around;padding:14px 5px calc(14px + env(safe-area-inset-bottom));font-size:11px;color:#9aabc4}
+nav button{background:transparent;color:inherit;padding:6px;font-size:12px}
+nav button.active{color:#3985ff}
+.section{display:none}
+.section.active{display:block}
+.note{font-size:12px;line-height:1.5;color:#8997ac}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">MEU<span>CAPITAL</span></div>
+  <div class="muted">CONTROLE FINANCEIRO</div>
+</header>
+<main>
+<section id="inicio" class="section active">
+  <div class="muted" id="greeting">TEU DINHEIRO, TEU FUTURO</div>
+  <div class="card">
+    <div class="eyebrow">Capital acumulado</div>
+    <div class="balance" id="balance">R$ 0,00</div>
+    <div class="muted">Total de lucros registrados</div>
+    <div style="margin-top:22px;display:flex;justify-content:space-between;align-items:center">
+      <span class="muted">Este mês</span><strong class="blue" id="monthMain">R$ 0,00</strong>
+    </div>
+  </div>
+  <div class="grid">
+    <div class="stat"><span class="muted">Hoje</span><strong id="today">R$ 0,00</strong></div>
+    <div class="stat"><span class="muted">Esta semana</span><strong id="week">R$ 0,00</strong></div>
+    <div class="stat"><span class="muted">Este mês</span><strong id="month">R$ 0,00</strong></div>
+    <div class="stat"><span class="muted">Este ano</span><strong id="year">R$ 0,00</strong></div>
+  </div>
+  <div class="actions">
+    <button class="primary" onclick="show('adicionar')">＋ Registrar lucro</button>
+    <button class="secondary" onclick="show('historico')">Ver lançamentos</button>
+  </div>
+  <h2>Últimos lançamentos</h2>
+  <div class="card" id="recent"><div class="muted">Teus lucros aparecerão aqui.</div></div>
+</section>
+
+<section id="adicionar" class="section">
+  <h2>Registrar lucro</h2>
+  <div class="card">
+    <form id="profitForm">
+      <label for="amount">Valor do lucro (R$)</label>
+      <input id="amount" type="number" min="0.01" step="0.01" placeholder="0,00" required>
+      <label for="category">Categoria</label>
+      <select id="category">
+        <option>Serviços</option><option>Vendas</option>
+        <option>Comissões</option><option>Outros</option>
+      </select>
+      <label for="description">Descrição</label>
+      <input id="description" maxlength="100" placeholder="Ex.: edição de vídeo">
+      <label for="date">Data do lucro</label>
+      <input id="date" type="date" required>
+      <button class="primary" type="submit">Salvar lançamento</button>
+    </form>
+  </div>
+  <p class="note">Registra aqui o lucro líquido que tu quer acompanhar, não o faturamento bruto, para não confundir vendas com ganhos.</p>
+</section>
+
+<section id="historico" class="section">
+  <h2>Histórico de lucros</h2>
+  <div class="card">
+    <label for="filter">Filtrar lançamentos</label>
+    <select id="filter">
+      <option value="all">Todo o histórico</option>
+      <option value="today">Hoje</option>
+      <option value="week">Esta semana</option>
+      <option value="month">Este mês</option>
+      <option value="year">Este ano</option>
+    </select>
+    <div id="history"></div>
+  </div>
+  <button class="secondary" style="width:100%;margin-bottom:10px" onclick="exportData()">Exportar cópia de segurança</button>
+  <button class="secondary" style="width:100%" onclick="document.getElementById('importFile').click()">Restaurar cópia de segurança</button>
+  <input id="importFile" type="file" accept=".json,application/json" style="display:none">
+  <p class="note">Guarda a cópia de segurança num local seguro. Os dados ficam neste navegador.</p>
+</section>
+
+<section id="resumo" class="section">
+  <h2>Teu resumo financeiro</h2>
+  <div class="card">
+    <div class="eyebrow">Lucro acumulado</div>
+    <div class="balance blue" id="sumTotal">R$ 0,00</div>
+    <div class="entry"><span>Melhor dia</span><strong id="bestDay">—</strong></div>
+    <div class="entry"><span>Média por dia com lucro</span><strong id="average">R$ 0,00</strong></div>
+    <div class="entry"><span>Quantidade de lançamentos</span><strong id="count">0</strong></div>
+  </div>
+  <h2>Metas</h2>
+  <div class="card">
+    <label for="goal">Meta mensal de lucro (R$)</label>
+    <input id="goal" type="number" min="0" step="0.01" placeholder="Ex.: 5000">
+    <button class="primary" onclick="saveGoal()">Salvar meta</button>
+    <div style="margin-top:20px" id="goalProgress" class="muted">Define tua meta mensal.</div>
+  </div>
+</section>
+</main>
+<nav>
+  <button class="active" data-page="inicio" onclick="show('inicio')">⌂ Início</button>
+  <button data-page="historico" onclick="show('historico')">☷ Histórico</button>
+  <button data-page="adicionar" onclick="show('adicionar')">＋ Adicionar</button>
+  <button data-page="resumo" onclick="show('resumo')">▥ Resumo</button>
+</nav>
+<script>
+const KEY='meucapital_lancamentos_v1';
+const GOAL='meucapital_meta_v1';
+let entries=[];
+try{entries=JSON.parse(localStorage.getItem(KEY)||'[]');if(!Array.isArray(entries))entries=[]}catch(e){entries=[]}
+const money=n=>n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const todayISO=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+const dateObj=s=>new Date(s+'T12:00:00');
+const today=todayISO();
+document.getElementById('date').value=today;
+function total(list){return list.reduce((s,e)=>s+e.amount,0)}
+function weekStart(){let d=dateObj(today);d.setDate(d.getDate()-((d.getDay()+6)%7));return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function within(e,filter){
+ if(filter==='today')return e.date===today;
+ if(filter==='week')return e.date>=weekStart()&&e.date<=today;
+ if(filter==='month')return e.date.slice(0,7)===today.slice(0,7);
+ if(filter==='year')return e.date.slice(0,4)===today.slice(0,4);
+ return true;
+}
+function safeSave(){try{localStorage.setItem(KEY,JSON.stringify(entries));return true}catch(e){alert('Não foi possível salvar. Exporta uma cópia e verifica o espaço disponível.');return false}}
+function show(id){
+ document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id===id));
+ document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
+ render();window.scrollTo(0,0);
+}
+function row(e){
+ const el=document.createElement('div');el.className='entry';
+ const left=document.createElement('div');
+ const title=document.createElement('strong');title.textContent=e.description||e.category;
+ const small=document.createElement('small');small.textContent=`${e.date.split('-').reverse().join('/')} · ${e.category}`;
+ left.append(title,small);
+ const right=document.createElement('div');right.style.textAlign='right';
+ const value=document.createElement('strong');value.className='blue';value.textContent=money(e.amount);
+ const del=document.createElement('button');del.className='secondary';del.style.padding='6px 9px';del.style.marginTop='7px';del.textContent='Excluir';
+ del.onclick=()=>{if(confirm('Excluir este lançamento?')){entries=entries.filter(x=>x.id!==e.id);safeSave();render()}};
+ right.append(value,del);el.append(left,right);return el;
+}
+function render(){
+ const sum=total(entries);
+ document.getElementById('balance').textContent=money(sum);
+ document.getElementById('monthMain').textContent=money(total(entries.filter(e=>within(e,'month'))));
+ for(const [id,f] of [['today','today'],['week','week'],['month','month'],['year','year']])document.getElementById(id).textContent=money(total(entries.filter(e=>within(e,f))));
+ const recent=document.getElementById('recent');recent.replaceChildren();
+ const last=[...entries].sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id).slice(0,4);
+ if(!last.length){recent.textContent='Teus lucros aparecerão aqui.';recent.className='card muted'}else{recent.className='card';last.forEach(e=>recent.append(row(e)))}
+ const hist=document.getElementById('history');hist.replaceChildren();
+ const filtered=entries.filter(e=>within(e,document.getElementById('filter').value)).sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
+ if(!filtered.length){hist.textContent='Nenhum lançamento neste período.';hist.className='muted'}else{hist.className='';filtered.forEach(e=>hist.append(row(e)))}
+ document.getElementById('sumTotal').textContent=money(sum);
+ document.getElementById('count').textContent=entries.length;
+ const days={};entries.forEach(e=>days[e.date]=(days[e.date]||0)+e.amount);
+ const best=Object.entries(days).sort((a,b)=>b[1]-a[1])[0];
+ document.getElementById('bestDay').textContent=best?`${money(best[1])} · ${best[0].split('-').reverse().join('/')}`:'—';
+ document.getElementById('average').textContent=money(Object.keys(days).length?sum/Object.keys(days).length:0);
+ const goal=Number(localStorage.getItem(GOAL)||0),m=total(entries.filter(e=>within(e,'month')));
+ document.getElementById('goal').value=goal||'';
+ document.getElementById('goalProgress').textContent=goal?`${money(m)} de ${money(goal)} (${Math.min(100,m/goal*100).toFixed(1)}% da meta)`:'Define tua meta mensal.';
+}
+document.getElementById('profitForm').addEventListener('submit',e=>{
+ e.preventDefault();
+ const amount=Number(document.getElementById('amount').value);
+ const date=document.getElementById('date').value;
+ if(!Number.isFinite(amount)||amount<=0||!date){alert('Confere o valor e a data.');return}
+ entries.push({id:Date.now(),amount,category:document.getElementById('category').value,description:document.getElementById('description').value.trim(),date});
+ if(!safeSave())return;
+ e.target.reset();document.getElementById('date').value=todayISO();show('inicio');
+});
+document.getElementById('filter').addEventListener('change',render);
+function saveGoal(){
+ const n=Number(document.getElementById('goal').value);
+ if(!Number.isFinite(n)||n<0){alert('Insere uma meta válida.');return}
+ localStorage.setItem(GOAL,String(n));render();alert('Meta salva!');
+}
+function exportData(){
+ const blob=new Blob([JSON.stringify({entries,goal:localStorage.getItem(GOAL)||'0'},null,2)],{type:'application/json'});
+ const url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download='meucapital-backup.json';a.click();URL.revokeObjectURL(url);
+}
+document.getElementById('importFile').addEventListener('change',async e=>{
+ const file=e.target.files[0];if(!file)return;
+ try{
+  const data=JSON.parse(await file.text()),list=Array.isArray(data)?data:data.entries;
+  if(!Array.isArray(list)||!list.every(x=>Number.isFinite(x.amount)&&typeof x.date==='string'))throw Error();
+  if(!confirm('Restaurar esta cópia? Os lançamentos atuais serão substituídos.'))return;
+  entries=list;safeSave();if(data.goal!==undefined)localStorage.setItem(GOAL,String(data.goal));render();alert('Cópia restaurada!');
+ }catch(err){alert('Arquivo inválido ou incompatível.')}
+ e.target.value='';
+});
+render();
+</script>
+</body>
+</html>
